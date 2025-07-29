@@ -175,11 +175,11 @@ chmod +x *.sh
 ### 🔹 Step 10: Push Code to GitHub
 
 ```bash
-git init
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
-git add .
-git commit -m "Initial commit"
-git push -u origin master
+git init                                                             #initialize github
+git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git #connect github account
+git add .                                                            # Stages all changes for commit
+git commit -m "Initial commit"                                       # Saves changes with a message
+git push -u origin master                                            # Pushes code to GitHub
 ```
 
 ---
@@ -224,30 +224,30 @@ Paste the following in the Pipeline script section:
 
 ```groovy
 pipeline {
-    agent any
+    agent any                                                              # Run this pipeline on any available Jenkins agent
 
     environment {
-        APP_DIR = "$WORKSPACE"
+        APP_DIR = "$WORKSPACE"                                             # Set an environment variable APP_DIR to the current Jenkins workspace
     }
 
     stages {
         stage('Clone') {
             steps {
-                git 'https://github.com/YOUR_USERNAME/YOUR_REPO.git'
+                git 'https://github.com/YOUR_USERNAME/YOUR_REPO.git'       # Clone your application code from GitHub into the Jenkins workspace
             }
         }
 
         stage('Build') {
             steps {
-                sh 'chmod +x build.sh'
-                sh './build.sh'
+                sh 'chmod +x build.sh'                                     # Make the build script executable
+                sh './build.sh'                                            # Run the build script (e.g., install dependencies, compile code)
             }
         }
 
         stage('Deploy') {
             steps {
-                sh 'chmod +x deploy.sh'
-                sh './deploy.sh'
+                sh 'chmod +x deploy.sh'                                    # Make the deploy script executable
+                sh './deploy.sh'                                           # Run the deploy script (e.g., upload files, restart server)
             }
         }
 
@@ -255,12 +255,14 @@ pipeline {
             steps {
                 script {
                     def result = sh(script: "curl -f http://localhost:3000/health", returnStatus: true)
+                                                                           # Send a request to the app's health endpoint and store the response status
+                                                                            # curl -f will return a non-zero exit code if the status is not 2xx
                     if (result != 0) {
-                        echo "App unhealthy. Rolling back..."
-                        sh './rollback.sh'
-                        error("App failed health check")
+                        echo "App unhealthy. Rolling back..."               # Log message if the app is unhealthy
+                        sh './rollback.sh'                                  # Run rollback script to undo the failed deployment
+                        error("App failed health check")                    # Stop the pipeline and mark it as failed
                     } else {
-                        echo "Health check passed ✅"
+                        echo "Health check passed ✅"                       # Log success message if the app is healthy
                     }
                 }
             }
@@ -269,16 +271,15 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment successful 🎉'
-            sh './send-sns-success.sh'
+            echo 'Deployment successful 🎉'                                 # Message after pipeline success
+            sh './send-sns-success.sh'                                      # Script to send a success notification (e.g., via SNS or Slack)
         }
         failure {
-            echo 'Deployment failed ❌'
-            sh './send-sns-failure.sh'
+            echo 'Deployment failed ❌'                                     # Message after pipeline failure
+            sh './send-sns-failure.sh'                                       # Script to send a failure notification
         }
     }
 }
-```
 
 ---
 
