@@ -35,6 +35,9 @@ The pipeline performs the following:
 
 ---
 
+## 📁 Project Structure
+
+```
 Failure_Recovery_Pipeline/
 │
 ├── App.js                # 🟢 Simple Node.js app (listens on port 3000)
@@ -42,8 +45,10 @@ Failure_Recovery_Pipeline/
 ├── deploy.sh             # 🚀 Deploys the Node.js app and runs it in background
 ├── healthcheck.sh        # ❤️ Performs health check on deployed app
 ├── rollback.sh           # ⏪ Rolls back to previous stable commit if health check fails
-├── send-sns-success.sh   # 📩 Sends email via SNS on successful deployment
+├── send-sns-success.sh   # 📬 Sends email via SNS on successful deployment
 ├── send-sns-failure.sh   # ⚠️ Sends email via SNS on failed deployment
+```
+
 
 
 
