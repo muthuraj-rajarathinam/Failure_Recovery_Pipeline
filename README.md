@@ -109,7 +109,7 @@ sudo systemctl start jenkins
 ### 🔹 Step 6: Access Jenkins Dashboard
 
 * Visit: `http://<EC2_PUBLIC_IP>:8080`
-* Unlock Jenkins:
+* Unlock Jenkins with password from Terminal using:
 
 ```bash
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
