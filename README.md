@@ -1,20 +1,17 @@
 🚀 Failure Recovery CI/CD Pipeline with Jenkins, Node.js, EC2, and AWS SNS
 
-This guide explains how to set up a Jenkins pipeline on an EC2 instance to deploy a Node.js application, perform health checks, send notifications via SNS, and automatically roll back on failure. 
+Failure Recovery CI/CD Pipeline is a robust, production-ready Jenkins CI/CD pipeline that automatically deploys a Node.js app to an EC2 instance with built-in health checks, SNS alerts, and rollback on failure.
 
-The pipeline performs the following:
--Clones your GitHub repo
--Builds and deploys your app on an EC2 instance
--Performs a health check
-   If the health check fails:
-    ```
-     Automatically rolls back to the previous commit
-     Sends a failure notification via AWS SNS(Email)
-    ```
-   On success:
-    ```
-     Sends a success notification(Email)
-    ```
+This project demonstrates:
+```
+✅ Automated deployment via Jenkins
+❤️ Health check to validate app uptime
+⚠️ Auto rollback using Git if health check fails
+📬 AWS SNS integration for success/failure notifications
+💻 End-to-end scripting (build.sh, deploy.sh, rollback.sh, etc.)
+```
+
+It's built to ensure zero-downtime, self-healing deployments — ideal for real-world production environments.
 
 ## 📦 Features
 
