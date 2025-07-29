@@ -16,16 +16,13 @@ The pipeline performs the following:
      Sends a success notification(Email)
     ```
 
-Failure_Recovery_Pipeline/
-│
-├── build.sh              # Build script (currently installs dependencies)
-├── deploy.sh             # Deploys the Node.js app
-├── healthcheck.sh        # check the health 
-├── rollback.sh           # Rollback script on failure
-├── send-sns-success.sh   # SNS success email trigger
-├── send-sns-failure.sh   # SNS failure email trigger
-├── App.js            n   # Simple Node.js app
-├── README.md             # Full project guide
+## 📦 Features
+
+* ✅ Clones source code from GitHub
+* 🔧 Builds and deploys a Node.js app
+* 🧪 Performs health checks
+* 📉 Automatically rolls back on failure
+* 📬 Sends email notifications via AWS SNS
 
 ---
 
@@ -38,132 +35,190 @@ Failure_Recovery_Pipeline/
 
 ---
 
+Failure_Recovery_Pipeline/
+│
+├── build.sh              # Build script (currently installs dependencies)
+├── deploy.sh             # Deploys the Node.js app
+├── healthcheck.sh        # check the health 
+├── rollback.sh           # Rollback script on failure
+├── send-sns-success.sh   # SNS success email trigger
+├── send-sns-failure.sh   # SNS failure email trigger
+├── App.js            n   # Simple Node.js app
+├── README.md             # Full project guide
+
+
 ## 🧱 Step-by-Step Setup
 
-### Step 1: Launch EC2 Instance
+### 🔹 Step 1: Launch EC2 Instance
 
-```bash
-# Go to AWS EC2 Console
-# Launch a new EC2 instance with:
-# - Amazon Linux 2
-# - t3.small (recommended)
-# - Create key pair (PEM format)
-# - Security Groups → Inbound Rules -> 22 (SSH), 8080 (Jenkins), 3000 (Node app)
-```
+* Go to AWS EC2 Console
+* Launch a new EC2 instance with:
 
-### Step 2: Connect to EC2 using PEM in Gitbash
+  * Amazon Linux 2
+  * t3.small (recommended)
+  * Create key pair in PEM format
+  * Configure Security Groups:
+
+    * ✅ Port 22 (SSH)
+    * ✅ Port 8080 (Jenkins)
+    * ✅ Port 3000 (Node.js app)
+
+---
+
+### 🔹 Step 2: Connect to EC2
 
 ```bash
 chmod 400 your-key.pem
 ssh -i your-key.pem ec2-user@your-ec2-public-ip
 ```
 
-### Step 3: Install Essentials
+---
+
+### 🔹 Step 3: Install Essentials
 
 ```bash
 sudo yum update -y
 sudo yum install git unzip curl wget -y
 ```
 
-### Step 4: Install Java 17
+---
+
+### 🔹 Step 4: Install Java (Jenkins Dependency)
 
 ```bash
 sudo amazon-linux-extras install java-openjdk11 -y
-java -version  # Check Java version
+java -version  # Verify Java installation
 ```
 
-### Step 5: Install Jenkins
+---
+
+### 🔹 Step 5: Install Jenkins
 
 ```bash
 sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
 sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 sudo yum install jenkins -y
-sudo systemctl enable jenkins #enable and start jenkins
+sudo systemctl enable jenkins
 sudo systemctl start jenkins
 ```
 
-### Step 6: Open Jenkins Dashboard
+---
+
+### 🔹 Step 6: Access Jenkins Dashboard
+
+* Visit: `http://<EC2_PUBLIC_IP>:8080`
+* Unlock Jenkins:
 
 ```bash
-# Open http://EC2_PUBLIC_IP:8080 in your browser
-# Get Jenkins password in gitbash terminal:
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```
 
-* Install default plugins
-* Create admin user
+* Install suggested plugins
+* Create your admin user
 
 ---
 
-## 💻 Setup Node.js App and GitHub Repo
+## 💻 Set Up Your Node.js App
 
-### Step 7: Create App Directory
+### 🔹 Step 7: Create App Directory in EC2
 
 ```bash
 mkdir ~/myapp && cd ~/myapp
 ```
 
-### Step 8: Create Node App Files
+### 🔹 Step 8: Create `app.js`
 
-create simple app code using nodejs -> app.js
+Add a simple Node.js app, for example:
 
-### Step 9: Create CI/CD Scripts
+```js
+const http = require('http');
+const PORT = 3000;
 
-```bash
-# build.sh
-# deploy.sh
-# rollback.sh
-# healthcheck.sh
-# send-sns-success.sh
-# send-sns-failure.sh
+const server = http.createServer((req, res) => {
+  if (req.url === '/health') {
+    res.writeHead(200);
+    res.end('OK');
+  } else {
+    res.writeHead(200);
+    res.end('Hello from Node.js CI/CD Pipeline');
+  }
+});
+
+server.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
 ```
 
-Make scripts executable:
+---
+
+### 🔹 Step 9: Add CI/CD Shell Scripts
+
+Create the following files in your repo:
+
+* `build.sh` – Installs dependencies
+* `deploy.sh` – Starts Node.js app
+* `rollback.sh` – Git rollback + restart
+* `healthcheck.sh` – Performs curl check
+* `send-sns-success.sh` – SNS email for success
+* `send-sns-failure.sh` – SNS email for failure
+
+Make them executable:
 
 ```bash
 chmod +x *.sh
 ```
 
-### Step 10: Initialize Git Repo and Push to GitHub
+---
+
+### 🔹 Step 10: Push Code to GitHub
 
 ```bash
-git init                                                               #initialize github
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git   #connect github account
-git add .                                                              # Stages all changes for commit
-git commit -m "Initial commit"                                         # Saves changes with a message
-git push -u origin master                                              # Pushes code to GitHub
+git init
+git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
+git add .
+git commit -m "Initial commit"
+git push -u origin master
 ```
 
 ---
 
-## 🔐 IAM Role + SNS Setup
+## 🔐 Configure AWS IAM + SNS
 
-### Step 11: Create SNS Topic
+### 🔹 Step 11: Create SNS Topic
 
-```bash
-# In AWS Console, create SNS topic and subscribe with your email.
-# Confirm email subscription.
+* AWS Console → SNS → Create Topic
+* Add your email as subscriber and confirm email
+
+### 🔹 Step 12: Create IAM Role for EC2
+
+* Go to IAM → Roles → Create Role
+* Select EC2 as use case
+* Attach custom policy:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "sns:Publish",
+      "Resource": "arn:aws:sns:REGION:ACCOUNT_ID:TOPIC_NAME"
+    }
+  ]
+}
 ```
 
-### Step 12: Create IAM Role for EC2
-
-* IAM > Roles > Create Role
-* Use Case: EC2
-* Attach Policies: `AmazonSNSFullAccess`
-* Attach to EC2 instance
-
-### Step 13: Configure AWS CLI on EC2
-
-```bash
-aws configure
-# Provide IAM user access key (optional if using instance role)
-```
+* Attach the role to your EC2 instance
 
 ---
 
-## ⚙️ Jenkins Pipeline Setup
+## ⚙️ Jenkins Pipeline Configuration
 
-### Step 14: Create New Pipeline Job in Jenkins
+### 🔹 Step 13: Create a New Pipeline Job
+
+* In Jenkins → New Item → Pipeline → Name it `Failure_Recovery_Pipeline`
+
+Paste the following in the Pipeline script section:
 
 ```groovy
 pipeline {
@@ -176,7 +231,7 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                git 'https://github.com/YOUR_USERNAME/YOUR_REPO.git'  # Clone GitHub repo
+                git 'https://github.com/YOUR_USERNAME/YOUR_REPO.git'
             }
         }
 
@@ -197,7 +252,7 @@ pipeline {
         stage('Health Check') {
             steps {
                 script {
-                    def result = sh(script: "curl -f http://localhost:3000", returnStatus: true)
+                    def result = sh(script: "curl -f http://localhost:3000/health", returnStatus: true)
                     if (result != 0) {
                         echo "App unhealthy. Rolling back..."
                         sh './rollback.sh'
@@ -225,29 +280,24 @@ pipeline {
 
 ---
 
-## 🧪 To Test Failure:
+## 🧪 Testing Failure Scenario
 
-* Change port in `server.js` to a wrong one (e.g. `PORT = 9999`) and push to GitHub.
-* Trigger pipeline again.
-* It will fail the health check and run `rollback.sh`
-* Email notification will be sent via SNS.
+1. In your app, change `PORT` to a non-matching one (e.g., 9999)
+2. Commit and push to GitHub
+3. Trigger the Jenkins job
+4. Jenkins will fail the health check and:
 
----
-
-## 📸 GitHub Project Images for Portfolio
-
-Include:
-
-* Jenkins Dashboard screenshot (with pipeline stages)
-* EC2 instance running app (`curl localhost:3000`)
-* GitHub repo screenshot
-* Terminal logs showing success and rollback
-* Email notification screenshot
+   * Call `rollback.sh`
+   * Restore the last working commit
+   * Send failure email via SNS
 
 ---
 
-## ✅ Done!
+## ✅ You're All Set!
 
-You now have a working CI/CD pipeline with automatic failure recovery and SNS notifications.
+You now have a working full CI/CD pipeline that:
 
-
+* Builds and deploys code from GitHub
+* Checks app health
+* Rolls back on failure
+* Sends success/failure alerts via email using AWS SNS
