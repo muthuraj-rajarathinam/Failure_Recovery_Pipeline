@@ -160,7 +160,7 @@ Create the following files in your repo:
 * `build.sh` – Installs dependencies
 * `deploy.sh` – Starts Node.js app
 * `rollback.sh` – Git rollback + restart
-* `healthcheck.sh` – Performs curl check
+* `healthcheck.sh` – Performs Health check
 * `send-sns-success.sh` – SNS email for success
 * `send-sns-failure.sh` – SNS email for failure
 
