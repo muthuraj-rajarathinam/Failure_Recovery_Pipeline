@@ -37,14 +37,14 @@ The pipeline performs the following:
 
 Failure_Recovery_Pipeline/
 │
-├── build.sh              # Build script (currently installs dependencies)
-├── deploy.sh             # Deploys the Node.js app
-├── healthcheck.sh        # check the health 
-├── rollback.sh           # Rollback script on failure
-├── send-sns-success.sh   # SNS success email trigger
-├── send-sns-failure.sh   # SNS failure email trigger
-├── App.js            n   # Simple Node.js app
-├── README.md             # Full project guide
+├── App.js                # 🟢 Simple Node.js app (listens on port 3000)
+├── build.sh              # 🛠️ Installs required Node.js dependencies
+├── deploy.sh             # 🚀 Deploys the Node.js app and runs it in background
+├── healthcheck.sh        # ❤️ Performs health check on deployed app
+├── rollback.sh           # ⏪ Rolls back to previous stable commit if health check fails
+├── send-sns-success.sh   # 📩 Sends email via SNS on successful deployment
+├── send-sns-failure.sh   # ⚠️ Sends email via SNS on failed deployment
+
 
 
 ## 🧱 Step-by-Step Setup
