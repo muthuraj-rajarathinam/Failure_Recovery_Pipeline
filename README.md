@@ -1,4 +1,4 @@
-# 🚀 Failure Recovery CI/CD Pipeline with Jenkins, Node.js, EC2 and AWS SNS
+# 🚀 Failure Recovery CI/CD Pipeline with Jenkins
 
 Failure Recovery CI/CD Pipeline is a robust, production-ready Jenkins CI/CD pipeline that automatically deploys a Node.js app to an EC2 instance with built-in health checks, SNS alerts, and rollback using local backups on EC2.
 
