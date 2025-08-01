@@ -1,22 +1,25 @@
 #!/bin/bash
 
 APP_DIR="/home/ec2-user/myapp"
+BACKUP_DIR="/home/ec2-user/myapp_backup"
 LOG_FILE="/home/ec2-user/deploy.log"
 
-echo "⚠️ Running rollback..."    # <-- [ADDED: visible in Jenkins console]
+echo "⚠️ Running rollback..." | tee -a $LOG_FILE
 echo "⚠️ Rollback started at $(date)" >> $LOG_FILE
 
-cd $APP_DIR || exit
+if [ -d "$BACKUP_DIR" ]; then
+    rm -rf "$APP_DIR"
+    cp -r "$BACKUP_DIR" "$APP_DIR"
+    cd "$APP_DIR" || exit
 
-# Revert to previous commit
-git reset --hard HEAD~1
+    npm install
 
-# Install dependencies
-npm install
+    pkill node || true
+    nohup node app.js > app.log 2>&1 &
 
-# Restart Node.js app
-pkill node || true
-nohup node server.js > app.log 2>&1 &
-
-echo "✅ Rollback finished!"     # <-- [ADDED: visible in Jenkins console]
-echo "✅ Rollback complete at $(date)" >> $LOG_FILE
+    echo "✅ Rollback finished!" | tee -a $LOG_FILE
+    echo "✅ Rollback complete at $(date)" >> $LOG_FILE
+else
+    echo "❌ No backup found. Rollback failed!" | tee -a $LOG_FILE
+    exit 1
+fi
